@@ -3,6 +3,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import appConfig from './config/config.service';
 import { validateEnv } from './config/validateEnv';
+import { AuthModule } from './auth/auth.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -24,6 +25,7 @@ import { validateEnv } from './config/validateEnv';
         synchronize: true,
       }),
     }),
+    AuthModule,
   ],
 })
 export class AppModule {}
