@@ -1,9 +1,9 @@
 export default () => ({
   environment: 'development',
   database: {
-    host: 'localhost',
-    user: 'dev_user',
-    password: process.env.DATABASE_PASSWORD,
-    name: 'dev_database',
+    host: '127.0.0.1',
+    user: 'root',
+    password: '',
+    name: 'shopping',
   },
 });

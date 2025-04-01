@@ -3,9 +3,9 @@ export default () => ({
   database: {
     host: process.env.DATABASE_HOST || 'localhost',
     port: process.env.DATABASE_PORT || 3306,
-    user: process.env.DATABASE_USER || 'root',
+    user: process.env.DATABASE_USER || 'admin',
     password: process.env.DATABASE_PASSWORD,
-    name: process.env.DATABASE_NAME || 'shopping',
+    name: process.env.DATABASE_NAME || 'app',
   },
   jwt: {
     accessSecret: 'your_access_secret',
