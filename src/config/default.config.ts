@@ -8,7 +8,9 @@ export default () => ({
     name: process.env.DATABASE_NAME || 'shopping',
   },
   jwt: {
-    secret: 'your_secret_key',
-    expiresIn: '24h',
+    accessSecret: 'your_access_secret',
+    refreshSecret: 'your_refresh_secret',
+    accessExpiresIn: '15m',
+    refreshExpiresIn: '7d',
   },
 });
