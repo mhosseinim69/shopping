@@ -4,6 +4,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import appConfig from './config/config.service';
 import { validationSchema } from './config/validation';
 import { AuthModule } from './auth/auth.module';
+import { LoggerModule } from './logger/logger.module';
+import { AppLoggerService } from './logger/logger.service';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -26,6 +28,9 @@ import { AuthModule } from './auth/auth.module';
       }),
     }),
     AuthModule,
+    LoggerModule,
   ],
+  providers: [AppLoggerService],
+  exports: [AppLoggerService],
 })
 export class AppModule {}
