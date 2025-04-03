@@ -6,6 +6,7 @@ import { validationSchema } from './config/validation';
 import { AuthModule } from './auth/auth.module';
 import { LoggerModule } from './logger/logger.module';
 import { AppLoggerService } from './logger/logger.service';
+import { CompanyModule } from './company/company.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -29,6 +30,7 @@ import { AppLoggerService } from './logger/logger.service';
     }),
     AuthModule,
     LoggerModule,
+    CompanyModule,
   ],
   providers: [AppLoggerService],
   exports: [AppLoggerService],

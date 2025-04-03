@@ -88,7 +88,9 @@ export class AuthService {
   }
 
   async logout(userId: number) {
-    await this.usersRepository.update(userId, { refreshToken: undefined });
+    await this.usersRepository.update(userId, {
+      refreshToken: undefined,
+    });
     return { message: 'Logged out successfully' };
   }
 }

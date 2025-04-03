@@ -5,7 +5,6 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { Request } from 'express';
-
 @Injectable()
 export class RefreshTokenGuard implements CanActivate {
   canActivate(context: ExecutionContext): boolean {
