@@ -8,6 +8,7 @@ import {
   Body,
   UseFilters,
   UseGuards,
+  Req,
 } from '@nestjs/common';
 import { CompanyService } from './company.service';
 import { CreateCompanyDto, UpdateCompanyDto } from './dto/company.dto';
@@ -21,8 +22,9 @@ export class CompanyController {
   constructor(private readonly companyService: CompanyService) {}
 
   @Post()
-  async create(@Body() createCompanyDto: CreateCompanyDto) {
-    return await this.companyService.create(createCompanyDto);
+  async create(@Body() createCompanyDto: CreateCompanyDto, @Req() req) {
+    const userId = req.user.userId;
+    return await this.companyService.create(createCompanyDto, userId);
   }
 
   @Get()
@@ -39,12 +41,15 @@ export class CompanyController {
   async update(
     @Param('id') id: number,
     @Body() updateCompanyDto: UpdateCompanyDto,
+    @Req() req,
   ) {
-    return await this.companyService.update(id, updateCompanyDto);
+    const userId = req.user.userId;
+    return await this.companyService.update(id, updateCompanyDto, userId);
   }
 
   @Delete(':id')
-  async remove(@Param('id') id: number) {
-    return await this.companyService.delete(id);
+  async remove(@Param('id') id: number, @Req() req) {
+    const userId = req.user.userId;
+    return await this.companyService.delete(id, userId);
   }
 }

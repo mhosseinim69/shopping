@@ -1,4 +1,6 @@
 import { DataSource } from 'typeorm';
+import { User } from './users/user.entity';
+import { Company } from './company/company.entity';
 
 export const databaseConfig = {
   get: (key: string) => {
@@ -20,7 +22,7 @@ export const AppDataSource = new DataSource({
   username: databaseConfig.get('app.database.user'),
   password: '',
   database: databaseConfig.get('app.database.name'),
-  entities: ['dist/**/*.entity.js'],
-  migrations: ['dist/migrations/*.js'],
+  entities: [User, Company],
+  migrations: ['./migrations/*.ts'],
   synchronize: false,
 });
