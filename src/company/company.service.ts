@@ -1,9 +1,15 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  HttpException,
+  BadRequestException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Company } from './company.entity';
 import { CreateCompanyDto, UpdateCompanyDto } from './dto/company.dto';
 import { AppLoggerService } from '../logger/logger.service';
+import { CompanyNameAlreadyExistsException } from '../exceptions/companyname-already-exists.exception';
 
 @Injectable()
 export class CompanyService {
@@ -14,10 +20,27 @@ export class CompanyService {
   ) {}
 
   async create(createCompanyDto: CreateCompanyDto): Promise<Company> {
-    const company = this.companyRepository.create(createCompanyDto);
-    await this.companyRepository.save(company);
-    this.logger.log(`Company created: ${JSON.stringify(company)}`);
-    return company;
+    const { name } = createCompanyDto;
+    try {
+      const existingCompany = await this.companyRepository.findOne({
+        where: { name },
+      });
+      if (existingCompany) {
+        throw new CompanyNameAlreadyExistsException(name);
+      }
+
+      const company = this.companyRepository.create(createCompanyDto);
+      await this.companyRepository.save(company);
+
+      this.logger.log(`Company created: ${JSON.stringify(company)}`);
+      return company;
+    } catch (error) {
+      this.logger.error(`Error creating company: ${error.message}`);
+      if (error instanceof HttpException) {
+        throw error;
+      }
+      throw new BadRequestException(`Error creating company`);
+    }
   }
 
   async findById(id: number): Promise<Company> {
