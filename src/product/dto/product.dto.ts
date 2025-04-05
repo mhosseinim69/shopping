@@ -22,14 +22,18 @@ export class CreateProductDto {
   @IsOptional()
   @IsDate()
   createdAt?: Date;
+
+  @IsNotEmpty()
+  @IsNumber()
+  categoryId: number;
 }
 
 export class UpdateProductDto {
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   name: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsNumber()
   price: number;
 
@@ -40,4 +44,8 @@ export class UpdateProductDto {
   @IsOptional()
   @IsDate()
   updatedAt?: Date;
+
+  @IsOptional()
+  @IsNumber()
+  categoryId: number;
 }

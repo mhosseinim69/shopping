@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Product } from './product.entity';
 import { Company } from '../company/company.entity';
+import { Category } from '../category/category.entity';
 import { CreateProductDto, UpdateProductDto } from './dto/product.dto';
 import { AppLoggerService } from '../logger/logger.service';
 import { ProductNameAlreadyExistsException } from '../exceptions/productname-already-exists.exception';
@@ -11,6 +12,7 @@ import { CompanyNotFoundException } from '../exceptions/company-not-found.except
 import { CompanyHasGotProductException } from '../exceptions/company-has-got-product.exception-not-found.exception';
 import { UserNotAccessToProductException } from '../exceptions/user-not-access-to-product.exception';
 import { ProductNotFoundWithBarcodeException } from '../exceptions/product-not-found.exception-not-found-with-barcode.exception';
+import { CategoryNotFoundException } from '../exceptions/category-not-found.exception';
 @Injectable()
 export class ProductService {
   constructor(
@@ -18,6 +20,8 @@ export class ProductService {
     private readonly productRepository: Repository<Product>,
     @InjectRepository(Company)
     private readonly companyRepository: Repository<Company>,
+    @InjectRepository(Category)
+    private readonly categoryRepository: Repository<Category>,
     private readonly logger: AppLoggerService,
   ) {}
 
@@ -25,7 +29,7 @@ export class ProductService {
     createProductDto: CreateProductDto,
     companyId: number,
   ): Promise<Product> {
-    const { name } = createProductDto;
+    const { name, categoryId } = createProductDto;
 
     const existingProduct = await this.productRepository.findOne({
       where: { name },
@@ -45,10 +49,18 @@ export class ProductService {
       throw new CompanyHasGotProductException(companyId);
     }
 
+    const category = await this.categoryRepository.findOne({
+      where: { id: categoryId },
+    });
+    if (!category) {
+      throw new CategoryNotFoundException(categoryId);
+    }
+
     try {
       const product = this.productRepository.create({
         ...createProductDto,
         company,
+        category,
       });
       await this.productRepository.save(product);
       this.logger.log(`Product created: ${JSON.stringify(product)}`);
@@ -66,7 +78,7 @@ export class ProductService {
     try {
       const product = await this.productRepository.findOne({
         where: { barcode },
-        relations: ['company'],
+        relations: ['company', 'category'],
       });
       console.log('findByBarcode', product);
       if (!product) {
@@ -88,7 +100,7 @@ export class ProductService {
     try {
       const product = await this.productRepository.findOne({
         where: { id },
-        relations: ['company'],
+        relations: ['company', 'category'],
       });
       if (!product) {
         throw new ProductNotFoundException(id);
@@ -106,7 +118,9 @@ export class ProductService {
 
   async findAll(): Promise<Product[]> {
     try {
-      return await this.productRepository.find({ relations: ['company'] });
+      return await this.productRepository.find({
+        relations: ['company', 'category'],
+      });
     } catch (error) {
       this.logger.error(`Error finding product by ID: ${error.message}`);
       throw new BadRequestException(`Error finding all products`);
@@ -120,7 +134,7 @@ export class ProductService {
   ): Promise<Product> {
     const existingProduct = await this.productRepository.findOne({
       where: { id },
-      relations: ['company', 'company.owner'],
+      relations: ['company', 'company.owner', 'category'],
     });
     console.log('existingProduct', existingProduct);
     if (!existingProduct) {
@@ -161,7 +175,7 @@ export class ProductService {
   async delete(id: number, userId: number): Promise<any> {
     const existingProduct = await this.productRepository.findOne({
       where: { id },
-      relations: ['company', 'company.owner'],
+      relations: ['company', 'company.owner', 'category'],
     });
     if (!existingProduct) {
       throw new ProductNotFoundException(id);

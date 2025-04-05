@@ -6,8 +6,10 @@ import {
   UpdateDateColumn,
   OneToOne,
   JoinColumn,
+  ManyToOne,
 } from 'typeorm';
 import { Company } from '../company/company.entity';
+import { Category } from '../category/category.entity';
 
 @Entity({ name: 'products' })
 export class Product {
@@ -32,4 +34,8 @@ export class Product {
   @OneToOne(() => Company, (company) => company.product)
   @JoinColumn()
   company: Company;
+
+  @ManyToOne(() => Category, (category) => category.products, { eager: true })
+  @JoinColumn()
+  category: Category;
 }

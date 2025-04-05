@@ -22,10 +22,10 @@ export class CreateCompanyDto {
 }
 
 export class UpdateCompanyDto {
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   @Length(3, 50)
-  name: string;
+  name?: string;
 
   @IsOptional()
   @IsString()
