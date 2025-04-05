@@ -7,6 +7,7 @@ import { AuthModule } from './auth/auth.module';
 import { LoggerModule } from './logger/logger.module';
 import { AppLoggerService } from './logger/logger.service';
 import { CompanyModule } from './company/company.module';
+import { ProductModule } from './product/product.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -31,6 +32,7 @@ import { CompanyModule } from './company/company.module';
     AuthModule,
     LoggerModule,
     CompanyModule,
+    ProductModule,
   ],
   providers: [AppLoggerService],
   exports: [AppLoggerService],

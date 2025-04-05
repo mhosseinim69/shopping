@@ -8,6 +8,7 @@ import {
   JoinColumn,
 } from 'typeorm';
 import { User } from '../users/user.entity';
+import { Product } from '../product/product.entity';
 @Entity({ name: 'companies' })
 export class Company {
   @PrimaryGeneratedColumn()
@@ -28,4 +29,7 @@ export class Company {
   @OneToOne(() => User)
   @JoinColumn()
   owner: User;
+
+  @OneToOne(() => Product, (product) => product.company)
+  product: Product;
 }
