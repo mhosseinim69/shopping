@@ -10,6 +10,7 @@ import {
   UseGuards,
   Req,
   ParseIntPipe,
+  Query,
 } from '@nestjs/common';
 import { ProductService } from './product.service';
 import { CreateProductDto, UpdateProductDto } from './dto/product.dto';
@@ -28,6 +29,11 @@ export class ProductController {
     @Body() createProductDto: CreateProductDto,
   ) {
     return await this.productService.create(createProductDto, companyId);
+  }
+
+  @Get('search')
+  async findByBarcode(@Query('barcode') barcode: string) {
+    return await this.productService.findByBarcode(barcode);
   }
 
   @Get()

@@ -10,7 +10,7 @@ import { ProductNotFoundException } from '../exceptions/product-not-found.except
 import { CompanyNotFoundException } from '../exceptions/company-not-found.exception';
 import { CompanyHasGotProductException } from '../exceptions/company-has-got-product.exception-not-found.exception';
 import { UserNotAccessToProductException } from '../exceptions/user-not-access-to-product.exception';
-
+import { ProductNotFoundWithBarcodeException } from '../exceptions/product-not-found.exception-not-found-with-barcode.exception';
 @Injectable()
 export class ProductService {
   constructor(
@@ -59,6 +59,28 @@ export class ProductService {
         throw error;
       }
       throw new BadRequestException(`Error creating product`);
+    }
+  }
+
+  async findByBarcode(barcode: string): Promise<Product> {
+    try {
+      const product = await this.productRepository.findOne({
+        where: { barcode },
+        relations: ['company'],
+      });
+      console.log('findByBarcode', product);
+      if (!product) {
+        throw new ProductNotFoundWithBarcodeException(barcode);
+      }
+      return product;
+    } catch (error) {
+      this.logger.error(`Error finding product by barcode: ${error.message}`);
+      if (error instanceof HttpException) {
+        throw error;
+      }
+      throw new BadRequestException(
+        `Error finding product by barcode: ${barcode}`,
+      );
     }
   }
 
