@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { Product } from './product.entity';
 import { Company } from '../company/company.entity';
 import { Category } from '../category/category.entity';
+import { Subcategory } from '../subcategory/subcategory.entity';
 import { CreateProductDto, UpdateProductDto } from './dto/product.dto';
 import { AppLoggerService } from '../logger/logger.service';
 import { ProductNameAlreadyExistsException } from '../exceptions/productname-already-exists.exception';
@@ -13,6 +14,7 @@ import { CompanyHasGotProductException } from '../exceptions/company-has-got-pro
 import { UserNotAccessToProductException } from '../exceptions/user-not-access-to-product.exception';
 import { ProductNotFoundWithBarcodeException } from '../exceptions/product-not-found.exception-not-found-with-barcode.exception';
 import { CategoryNotFoundException } from '../exceptions/category-not-found.exception';
+import { SubcategoryNotFoundException } from '../exceptions/subcategory-not-found.exception';
 @Injectable()
 export class ProductService {
   constructor(
@@ -22,6 +24,8 @@ export class ProductService {
     private readonly companyRepository: Repository<Company>,
     @InjectRepository(Category)
     private readonly categoryRepository: Repository<Category>,
+    @InjectRepository(Subcategory)
+    private readonly subcategoryRepository: Repository<Subcategory>,
     private readonly logger: AppLoggerService,
   ) {}
 
@@ -29,7 +33,7 @@ export class ProductService {
     createProductDto: CreateProductDto,
     companyId: number,
   ): Promise<Product> {
-    const { name, categoryId } = createProductDto;
+    const { name, categoryId, subcategoryId } = createProductDto;
 
     const existingProduct = await this.productRepository.findOne({
       where: { name },
@@ -56,11 +60,29 @@ export class ProductService {
       throw new CategoryNotFoundException(categoryId);
     }
 
+    let subcategory: Subcategory | null = null;
+    if (subcategoryId) {
+      subcategory = await this.subcategoryRepository.findOne({
+        where: { id: subcategoryId },
+        relations: ['category'],
+      });
+
+      if (!subcategory) {
+        throw new SubcategoryNotFoundException(subcategoryId);
+      }
+      if (subcategory.category.id !== category.id) {
+        throw new BadRequestException(
+          'Subcategory does not belong to the selected category',
+        );
+      }
+    }
+
     try {
       const product = this.productRepository.create({
         ...createProductDto,
         company,
         category,
+        subcategory: subcategory || undefined,
       });
       await this.productRepository.save(product);
       this.logger.log(`Product created: ${JSON.stringify(product)}`);
@@ -136,11 +158,9 @@ export class ProductService {
       where: { id },
       relations: ['company', 'company.owner', 'category'],
     });
-    console.log('existingProduct', existingProduct);
     if (!existingProduct) {
       throw new ProductNotFoundException(id);
     }
-    console.log('after existingProduct');
 
     const { name } = updateProductDto;
     if (name) {

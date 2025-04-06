@@ -4,6 +4,7 @@ import {
   IsString,
   IsNumber,
   IsDate,
+  IsInt,
 } from 'class-validator';
 
 export class CreateProductDto {
@@ -26,6 +27,10 @@ export class CreateProductDto {
   @IsNotEmpty()
   @IsNumber()
   categoryId: number;
+
+  @IsOptional()
+  @IsNumber()
+  subcategoryId?: number;
 }
 
 export class UpdateProductDto {
@@ -48,4 +53,8 @@ export class UpdateProductDto {
   @IsOptional()
   @IsNumber()
   categoryId: number;
+
+  @IsOptional()
+  @IsNumber()
+  subcategoryId?: number;
 }

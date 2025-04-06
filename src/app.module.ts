@@ -9,6 +9,7 @@ import { AppLoggerService } from './logger/logger.service';
 import { CompanyModule } from './company/company.module';
 import { ProductModule } from './product/product.module';
 import { CategoryModule } from './category/category.module';
+import { SubcategoryModule } from './subcategory/subcategory.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -35,6 +36,7 @@ import { CategoryModule } from './category/category.module';
     CompanyModule,
     ProductModule,
     CategoryModule,
+    SubcategoryModule,
   ],
   providers: [AppLoggerService],
   exports: [AppLoggerService],

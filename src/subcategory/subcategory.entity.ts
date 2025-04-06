@@ -2,22 +2,28 @@ import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
+  ManyToOne,
+  OneToMany,
   CreateDateColumn,
   UpdateDateColumn,
-  OneToMany,
 } from 'typeorm';
+import { Category } from '../category/category.entity';
 import { Product } from '../product/product.entity';
-import { Subcategory } from '../subcategory/subcategory.entity';
 
-@Entity({ name: 'categories' })
-export class Category {
+@Entity({ name: 'subcategories' })
+export class Subcategory {
   @PrimaryGeneratedColumn()
   id: number;
 
   @Column({ unique: true })
   name: string;
 
-  @OneToMany(() => Product, (product) => product.category)
+  @ManyToOne(() => Category, (category) => category.subcategories, {
+    onDelete: 'CASCADE',
+  })
+  category: Category;
+
+  @OneToMany(() => Product, (product) => product.subcategory)
   products: Product[];
 
   @CreateDateColumn()
@@ -25,7 +31,4 @@ export class Category {
 
   @UpdateDateColumn()
   updatedAt: Date;
-
-  @OneToMany(() => Subcategory, (subcategory) => subcategory.category)
-  subcategories: Subcategory[];
 }

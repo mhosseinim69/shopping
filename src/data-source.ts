@@ -3,6 +3,7 @@ import { User } from './users/user.entity';
 import { Company } from './company/company.entity';
 import { Product } from './product/product.entity';
 import { Category } from './category/category.entity';
+import { Subcategory } from './subcategory/subcategory.entity';
 
 export const databaseConfig = {
   get: (key: string) => {
@@ -24,7 +25,7 @@ export const AppDataSource = new DataSource({
   username: databaseConfig.get('app.database.user'),
   password: '',
   database: databaseConfig.get('app.database.name'),
-  entities: [User, Company, Product, Category],
+  entities: [User, Company, Product, Category, Subcategory],
   migrations: ['./migrations/*.ts'],
   synchronize: false,
 });

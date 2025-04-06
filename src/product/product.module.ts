@@ -3,12 +3,15 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Product } from './product.entity';
 import { Company } from '../company/company.entity';
 import { Category } from '../category/category.entity';
+import { Subcategory } from '../subcategory/subcategory.entity';
 import { AppLoggerService } from '../logger/logger.service';
 import { ProductService } from './product.service';
 import { ProductController } from './product.controller';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Product, Company, Category])],
+  imports: [
+    TypeOrmModule.forFeature([Product, Company, Category, Subcategory]),
+  ],
   providers: [ProductService, AppLoggerService],
   controllers: [ProductController],
   exports: [ProductService],
