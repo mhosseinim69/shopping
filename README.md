@@ -21,9 +21,9 @@
   <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
   [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
 
-## Description
+## Shopping
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+this is a comprehensive Product Management API designed to manage products, categories, companies, and their relationships. It allows users to create, update, and search for products, as well as handle the relationships between companies, categories, and subcategories.
 
 ## Project setup
 
@@ -89,9 +89,9 @@ Nest is an MIT-licensed open source project. It can grow thanks to the sponsors 
 
 ## Stay in touch
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+- Author - Mostafa Hosseini
+- Email - [m.hosseini.m69@gmail.com](m.hosseini.m69@gmail.com)
+- Linkedin - [@Mostafa Hosseini](https://www.linkedin.com/in/mostafa-hosseini-765349246/)
 
 ## License
 
