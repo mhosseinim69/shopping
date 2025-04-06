@@ -13,4 +13,9 @@ export default () => ({
     accessExpiresIn: '15m',
     refreshExpiresIn: '7d',
   },
+  cache: {
+    host: 'localhost',
+    port: 6379,
+    ttl: 60,
+  },
 });

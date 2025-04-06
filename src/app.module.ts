@@ -10,6 +10,8 @@ import { CompanyModule } from './company/company.module';
 import { ProductModule } from './product/product.module';
 import { CategoryModule } from './category/category.module';
 import { SubcategoryModule } from './subcategory/subcategory.module';
+import { CacheModule } from '@nestjs/cache-manager';
+import { redisStore } from 'cache-manager-ioredis';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -37,6 +39,16 @@ import { SubcategoryModule } from './subcategory/subcategory.module';
     ProductModule,
     CategoryModule,
     SubcategoryModule,
+    CacheModule.registerAsync({
+      useFactory: async (configService: ConfigService) => ({
+        store: await redisStore({
+          host: configService.get<string>('app.cache.host'),
+          port: configService.get<string>('app.cache.port'),
+          ttl: configService.get<string>('app.cache.ttl'),
+        }),
+      }),
+      isGlobal: true,
+    }),
   ],
   providers: [AppLoggerService],
   exports: [AppLoggerService],

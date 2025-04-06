@@ -1,4 +1,11 @@
-import { Injectable, HttpException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  HttpException,
+  BadRequestException,
+  Inject,
+} from '@nestjs/common';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Cache } from 'cache-manager';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Product } from './product.entity';
@@ -26,6 +33,7 @@ export class ProductService {
     private readonly categoryRepository: Repository<Category>,
     @InjectRepository(Subcategory)
     private readonly subcategoryRepository: Repository<Subcategory>,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
     private readonly logger: AppLoggerService,
   ) {}
 
@@ -97,23 +105,37 @@ export class ProductService {
   }
 
   async findByBarcode(barcode: string): Promise<Product> {
+    const cacheKey = `product:barcode:${barcode}`;
+
     try {
+      const cachedProduct = await this.cacheManager.get<Product>(cacheKey);
+      if (cachedProduct) {
+        this.logger.log(`Cache hit for barcode: ${barcode}`);
+        return cachedProduct;
+      }
+
       const product = await this.productRepository.findOne({
         where: { barcode },
-        relations: ['company', 'category'],
+        relations: ['company', 'category', 'subcategory'],
       });
-      console.log('findByBarcode', product);
+
       if (!product) {
         throw new ProductNotFoundWithBarcodeException(barcode);
       }
+
+      await this.cacheManager.set(cacheKey, product, 60);
+      this.logger.log(`Product cached for barcode: ${barcode}`);
+
       return product;
     } catch (error) {
-      this.logger.error(`Error finding product by barcode: ${error.message}`);
+      this.logger.error(`findByBarcode failed [${barcode}]: ${error.message}`);
+
       if (error instanceof HttpException) {
         throw error;
       }
+
       throw new BadRequestException(
-        `Error finding product by barcode: ${barcode}`,
+        `An error occurred while finding product by barcode: ${barcode}`,
       );
     }
   }
@@ -122,7 +144,7 @@ export class ProductService {
     try {
       const product = await this.productRepository.findOne({
         where: { id },
-        relations: ['company', 'category'],
+        relations: ['company', 'category', 'subcategory'],
       });
       if (!product) {
         throw new ProductNotFoundException(id);
@@ -141,7 +163,7 @@ export class ProductService {
   async findAll(): Promise<Product[]> {
     try {
       return await this.productRepository.find({
-        relations: ['company', 'category'],
+        relations: ['company', 'category', 'subcategory'],
       });
     } catch (error) {
       this.logger.error(`Error finding product by ID: ${error.message}`);
@@ -156,7 +178,7 @@ export class ProductService {
   ): Promise<Product> {
     const existingProduct = await this.productRepository.findOne({
       where: { id },
-      relations: ['company', 'company.owner', 'category'],
+      relations: ['company', 'company.owner', 'category', 'subcategory'],
     });
     if (!existingProduct) {
       throw new ProductNotFoundException(id);
@@ -195,7 +217,7 @@ export class ProductService {
   async delete(id: number, userId: number): Promise<any> {
     const existingProduct = await this.productRepository.findOne({
       where: { id },
-      relations: ['company', 'company.owner', 'category'],
+      relations: ['company', 'company.owner'],
     });
     if (!existingProduct) {
       throw new ProductNotFoundException(id);
